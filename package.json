@@ -1,0 +1,16 @@
+{
+  "name": "panorama",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "keywords": [],
+  "author": "Panorama Block",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "graphql-request": "^7.1.2",
+    "node-fetch": "^3.3.2"
+  }
+}
