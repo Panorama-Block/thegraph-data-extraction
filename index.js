@@ -1,35 +1,69 @@
 import { GraphQLClient, gql } from 'graphql-request';
+import dotenv from 'dotenv';
 
-const endpoint = 'https://gateway.thegraph.com/api/subgraphs/id/9EAxYE17Cc478uzFXRbM7PVnMUSsgb99XZiGxodbtpbk';
+dotenv.config();
 
-const client = new GraphQLClient(endpoint, {
-  headers: {
-    Authorization: 'Bearer f80997c7afbb7cb5e69cbffbc9c583bf',
-  },
-});
+const endpoints = JSON.parse(process.env.ENDPOINTS_JSON);
+const authToken = process.env.GRAPHQL_AUTH_TOKEN;
 
-const query = gql`
-{
-  factories(first: 5) {
-    id
-    poolCount
-    txCount
-    totalVolumeUSD
-  }
-  bundles(first: 5) {
-    id
-    nativePriceUSD
-  }
-}
-`;
+// Definição das queries
+const queries = [
+  gql`{
+    transactions(first: 5) {
+      id
+      logIndex
+      event
+      from
+    }
+    tokens(first: 5) {
+      id
+      transaction { id }
+      vault { id }
+      activationBlock
+    }
+    _meta {
+      deployment
+      hasIndexingErrors
+      block { hash number parentHash timestamp }
+    }
+  }`,
+  gql`{
+    factories(first: 5) {
+      id
+      poolCount
+      txCount
+      totalVolumeUSD
+      owner
+    }
+  }`,
+  gql`{
+    factories(first: 5) {
+      id
+      poolCount
+      txCount
+      totalVolumeUSD
+      owner
+      totalFeesUSD
+      totalFeesETH
+    }
+  }`
+];
 
-async function fetchData() {
+async function fetchData(endpoint, query) {
+  const client = new GraphQLClient(`https://gateway.thegraph.com/api/subgraphs/id/${endpoint}`, {
+    headers: {
+      Authorization: `Bearer ${authToken}`,
+    },
+  });
+
   try {
     const data = await client.request(query);
-    console.log(data);
+    console.log(`\nData from ${endpoint}:`, data);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    console.error(`Error fetching data from ${endpoint}:`, error);
   }
 }
 
-fetchData();
+for (let i = 0; i < endpoints.length; i++) {
+  fetchData(endpoints[i], queries[i]);
+}

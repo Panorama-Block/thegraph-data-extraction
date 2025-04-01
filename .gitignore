@@ -2,5 +2,5 @@
 *dist/
 *.cache/
 *node_modules/
-*/.env
+.env
 *dist-extension/
