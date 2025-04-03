@@ -25,44 +25,356 @@ func main() {
 
 	queries := []string{
 		`{
-			transactions(first: 5) {
-				id
-				logIndex
-				event
-				from
-			}
-			tokens(first: 5) {
-				id
-				transaction { id }
-				vault { id }
-				activationBlock
-			}
-			_meta {
-				deployment
-				hasIndexingErrors
-				block { hash number parentHash timestamp }
-			}
-		}`,
+  transactions(first: 1000) {
+    id
+    logIndex
+    event
+    from
+    gasLimit
+    gasPrice
+    gasSent
+    hash
+    index
+    timestamp
+    to
+    value
+  }
+  tokens(first: 1000) {
+    id
+    transaction {
+      id
+      blockNumber
+      event
+      from
+      gasLimit
+      gasPrice
+      gasSent
+      hash
+      index
+      logIndex
+      timestamp
+      to
+      value
+    }
+    vault {
+      id
+    }
+    activationBlock
+    blacklisted
+    decimals
+    depositFee
+    isNative
+    name
+    namePrefix
+    nativeAddr
+    nativeWid
+    symbol
+    symbolPrefix
+  }
+  _meta {
+    deployment
+    hasIndexingErrors
+  }
+  account(id: "") {
+    id
+  }
+  accounts {
+    id
+  }
+  alienTransfer(id: "") {
+    amount
+    baseChainId
+    baseToken
+    decimals
+    expectedEvers
+    id
+    name
+    payload
+    recipientAddr
+    recipientWid
+    symbol
+    value
+  }
+  alienTransfers {
+    amount
+    baseChainId
+    baseToken
+    decimals
+    expectedEvers
+    id
+    name
+    payload
+    recipientWid
+    recipientAddr
+    symbol
+    value
+  }
+  token(id: "") {
+    activationBlock
+    blacklisted
+    decimals
+    depositFee
+    id
+    isNative
+    name
+    namePrefix
+    nativeWid
+    nativeAddr
+    symbol
+    symbolPrefix
+    withdrawFee
+  }
+  vault(id: "") {
+    defaultAlienDepositFee
+    defaultAlienWithdrawFee
+    defaultNativeDepositFee
+    defaultNativeWithdrawFee
+    id
+  }
+  vaults
+  withdraw(id: "") {
+    fee
+    amount
+    isNative
+    id
+    payloadId
+  }
+}`,
 		`{
-			factories(first: 5) {
-				id
-				poolCount
-				txCount
-				totalVolumeUSD
-				owner
-			}
-		}`,
+  factories(first: 1000) {
+    id
+    poolCount
+    txCount
+    totalVolumeUSD
+    owner
+    totalFeesNative
+    totalFeesUSD
+    totalValueLockedNative
+    totalValueLockedUSD
+    totalVolumeNative
+    untrackedVolumeUSD
+  }
+  bundles(first: 1000) {
+    id
+    nativePriceUSD
+  }
+  TokenSearch(text: "") {
+    decimals
+    derivedNative
+    feesUSD
+    id
+    name
+    poolCount
+    symbol
+    tokenAddress
+    totalSupply
+    totalValueLocked
+    totalValueLockedUSD
+    txCount
+    volume
+    untrackedVolumeUSD
+    volumeUSD
+  }
+  _meta {
+    deployment
+    hasIndexingErrors
+  }
+  bundle(id: "") {
+    id
+    nativePriceUSD
+  }
+  burn(id: "") {
+    amount
+    amount0
+    amount1
+    amountUSD
+    id
+    origin
+    logIndex
+    owner
+    tickLower
+    tickUpper
+    timestamp
+  }
+  swap(id: "") {
+    origin
+    recipient
+    sender
+    sqrtPriceX96
+    tick
+    timestamp
+  }
+  swaps {
+    amountUSD
+    id
+    logIndex
+    origin
+    recipient
+    sender
+    sqrtPriceX96
+    tick
+    timestamp
+  }
+  token(id: "") {
+    decimals
+    derivedNative
+    feesUSD
+    id
+    name
+    poolCount
+    symbol
+    tokenAddress
+    totalSupply
+    totalValueLocked
+    totalValueLockedUSD
+    txCount
+    untrackedVolumeUSD
+    volume
+    volumeUSD
+  }
+  tokens {
+    decimals
+    derivedNative
+    id
+    feesUSD
+    name
+    poolCount
+    symbol
+    tokenAddress
+    totalSupply
+    totalValueLocked
+    totalValueLockedUSD
+    txCount
+    untrackedVolumeUSD
+    volume
+    volumeUSD
+  }
+}`,
 		`{
-			factories(first: 5) {
-				id
-				poolCount
-				txCount
-				totalVolumeUSD
-				owner
-				totalFeesUSD
-				totalFeesETH
-			}
-		}`,
+  factories(first: 1000) {
+    id
+    poolCount
+    txCount
+    totalVolumeUSD
+    owner
+    totalFeesETH
+    totalFeesUSD
+    totalValueLockedETH
+    totalValueLockedETHUntracked
+    totalValueLockedUSD
+    totalValueLockedUSDUntracked
+    totalVolumeETH
+    untrackedVolumeUSD
+  }
+  tokens(first: 1000) {
+    id
+    symbol
+    name
+    decimals
+    derivedETH
+    feesUSD
+    poolCount
+    totalValueLocked
+    totalValueLockedUSD
+    totalValueLockedUSDUntracked
+    txCount
+    untrackedVolumeUSD
+    volume
+    volumeUSD
+  }
+  _meta {
+    deployment
+    hasIndexingErrors
+  }
+  bundle(id: "") {
+    ethPriceUSD
+    id
+  }
+  bundles {
+    ethPriceUSD
+    id
+  }
+  burn(id: "") {
+    amount
+    amount0
+    amount1
+    amountUSD
+    id
+    logIndex
+    origin
+    owner
+    tickLower
+    tickUpper
+    timestamp
+  }
+  burns {
+    amount
+    amount0
+    amount1
+    amountUSD
+    id
+    logIndex
+    origin
+    owner
+    tickLower
+    tickUpper
+    timestamp
+  }
+  collect(id: "") {
+    amount0
+    amount1
+    amountUSD
+    id
+    logIndex
+    owner
+    tickLower
+    tickUpper
+    timestamp
+  }
+  collects {
+    amount0
+    amount1
+    amountUSD
+    id
+    logIndex
+    owner
+    tickLower
+    tickUpper
+    timestamp
+  }
+  factory(id: "") {
+    id
+    owner
+    totalFeesETH
+    poolCount
+    totalFeesUSD
+    totalValueLockedETH
+    totalValueLockedETHUntracked
+    totalValueLockedUSDUntracked
+    totalValueLockedUSD
+    totalVolumeETH
+    totalVolumeUSD
+    txCount
+    untrackedVolumeUSD
+  }
+  flash(id: "") {
+    amount0
+    amount0Paid
+    amount1
+    amount1Paid
+    amountUSD
+    logIndex
+    id
+    recipient
+    sender
+    timestamp
+  }
+  transaction(id: "") {
+    blockNumber
+    id
+    timestamp
+  }
+}`,
 	}
 
 	for i, endpoint := range endpoints {
