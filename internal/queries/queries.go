@@ -63,15 +63,6 @@ var queryVariants = map[string]map[string]string{
 }`,
 	},
 	"factories": {
-		"default": `{
-  factories(first: 1000) {
-    id
-    poolCount
-    txCount
-    totalVolumeUSD
-    owner
-  }
-}`,
 		"9EAxYE17Cc478uzFXRbM7PVnMUSsgb99XZiGxodbtpbk": `{
   factories(first: 1000) {
     id
@@ -80,26 +71,19 @@ var queryVariants = map[string]map[string]string{
     totalVolumeUSD
     owner
     totalFeesUSD
-    totalValueLockedUSD
-  }
-}`,
-	},
+    untrackedVolumeUSD
+  }}`,
+    "EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
+  factories(first: 1000) {
+    id
+    poolCount
+    txCount
+    totalVolumeUSD
+    owner
+    totalFeesUSD
+    untrackedVolumeUSD
+  }}`},
 	"swaps": {
-		"default": `{
-  swaps(first: 1000) {
-    id
-    timestamp
-  }
-}`,
-		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
-  swaps(first: 1000) {
-    id
-    origin
-    recipient
-    sender
-    timestamp
-  }
-}`,
 		"9EAxYE17Cc478uzFXRbM7PVnMUSsgb99XZiGxodbtpbk": `{
   swaps(first: 1000) {
     amountUSD
