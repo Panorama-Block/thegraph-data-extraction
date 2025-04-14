@@ -73,7 +73,7 @@ var queryVariants = map[string]map[string]string{
     totalFeesUSD
     untrackedVolumeUSD
   }}`,
-    "EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
+		"EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
   factories(first: 1000) {
     id
     poolCount
@@ -102,6 +102,26 @@ var queryVariants = map[string]map[string]string{
   }
 }`,
 	},
+	"_meta": {
+		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
+  _meta {
+    deployment
+    hasIndexingErrors
+  }
+}`,
+		"9EAxYE17Cc478uzFXRbM7PVnMUSsgb99XZiGxodbtpbk": `{
+   _meta {
+    deployment
+    hasIndexingErrors
+  }
+}`,
+		"EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
+  _meta {
+    deployment
+    hasIndexingErrors
+  }
+}`,
+	},
 }
 
 // GetEndpointID returns a shortened endpoint ID for use in logs and filenames
@@ -120,22 +140,22 @@ func GetQueryForEndpoint(endpoint string, queryType string) string {
 		if query, ok := variants[endpoint]; ok {
 			return query
 		}
-		
-		// If no exact match, try to find an endpoint that contains this one 
+
+		// If no exact match, try to find an endpoint that contains this one
 		// (for example, if endpoint is shortened)
 		for variantEndpoint, query := range variants {
-			if strings.Contains(endpoint, variantEndpoint) || 
-			   strings.Contains(variantEndpoint, endpoint) {
+			if strings.Contains(endpoint, variantEndpoint) ||
+				strings.Contains(variantEndpoint, endpoint) {
 				return query
 			}
 		}
-		
+
 		// Fall back to default if available
 		if defaultQuery, ok := variants["default"]; ok {
 			return defaultQuery
 		}
 	}
-	
+
 	// If no query is found or no default, return empty
 	return ""
-} 
+}

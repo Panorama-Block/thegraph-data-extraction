@@ -14,7 +14,7 @@ import (
 func main() {
 	// Define command-line flags
 	outputDir := flag.String("output", "data", "Output directory for extracted data")
-	concurrency := flag.Int("concurrency", 4, "Number of concurrent queries")
+	concurrency := flag.Int("concurrency", 5, "Number of concurrent queries")
 	flag.Parse()
 
 	// Load configuration
@@ -51,4 +51,4 @@ func main() {
 	}
 
 	fmt.Println("Data extraction completed successfully")
-} 
+}
