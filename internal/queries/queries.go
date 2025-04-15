@@ -122,6 +122,144 @@ var queryVariants = map[string]map[string]string{
   }
 }`,
 	},
+	"vaults": {
+		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
+  vaults {
+    defaultAlienDepositFee
+    defaultAlienWithdrawFee
+    defaultNativeDepositFee
+    defaultNativeWithdrawFee
+    id
+  }
+}`,
+	},
+	"withdraws": {
+		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
+  withdraws {
+    amount
+    fee
+    id
+    isNative
+    payloadId
+  }
+}`,
+	},
+	"burns": {
+		"9EAxYE17Cc478uzFXRbM7PVnMUSsgb99XZiGxodbtpbk": `{
+  burns {
+    amount
+    amount0
+    amount1
+    amountUSD
+    id
+    logIndex
+    origin
+    owner
+    tickLower
+    tickUpper
+    timestamp
+  }
+}`,
+		"EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
+  burns {
+    amount
+    amount0
+    amount1
+    amountUSD
+    id
+    logIndex
+    origin
+    owner
+    tickLower
+    tickUpper
+    timestamp
+  }
+}`,
+	},
+	"accounts": {
+		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
+  accounts {
+    id
+  }
+}`,
+	},
+	"pools": {
+		"9EAxYE17Cc478uzFXRbM7PVnMUSsgb99XZiGxodbtpbk": `{
+   pools {
+    balanceOfBlock
+    collectedFeesToken0
+    collectedFeesToken1
+    collectedFeesUSD
+    createdAtBlockNumber
+    createdAtTimestamp
+    feeGrowthBlock
+    feeGrowthGlobal0X128
+    feeGrowthGlobal1X128
+    feeTier
+    feesUSD
+    id
+    liquidity
+    liquidityProviderCount
+    observationIndex
+    protocolFeeToken0
+    protocolFeeToken1
+    sqrtPrice
+    tick
+    token0Price
+    token1Price
+    totalValueLockedNative
+    totalValueLockedToken0
+    totalValueLockedToken1
+    totalValueLockedUSD
+    txCount
+    untrackedVolumeUSD
+    volumeToken0
+    volumeToken1
+    volumeUSD
+  }
+}`,
+		"EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
+   pools {
+    collectedFeesToken0
+    collectedFeesToken1
+    collectedFeesUSD
+    createdAtBlockNumber
+    createdAtTimestamp
+    feeGrowthGlobal0X128
+    feeGrowthGlobal1X128
+    feeTier
+    feesUSD
+    id
+    initialFee
+    liquidity
+    liquidityProviderCount
+    observationIndex
+    sqrtPrice
+    tick
+    token0Price
+    token1Price
+    totalValueLockedETH
+    totalValueLockedToken0
+    totalValueLockedToken1
+    totalValueLockedUSD
+    totalValueLockedUSDUntracked
+    txCount
+    untrackedVolumeUSD
+    volumeToken1
+    volumeToken0
+    volumeUSD
+  }
+}`,
+	},
+	"skimFees": {
+		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
+  skimFees {
+    amount
+    id
+    skimToEverscale
+  }
+}`,
+	},
 }
 
 // GetEndpointID returns a shortened endpoint ID for use in logs and filenames

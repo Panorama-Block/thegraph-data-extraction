@@ -28,8 +28,8 @@ func NewService(client *client.TheGraphClient, endpoints []string) *Service {
 		client:      client,
 		endpoints:   endpoints,
 		outputDir:   "data",
-		queryTypes:  []string{"tokens", "transactions", "factories", "swaps", "_meta"},
-		concurrency: 5, // Number of concurrent queries
+		queryTypes:  []string{"tokens", "transactions", "factories", "swaps", "_meta", "vaults", "withdraws", "burns", "accounts", "pools", "skimFees"},
+		concurrency: 11, // Number of concurrent queries
 	}
 }
 
