@@ -1,74 +1,122 @@
 package main
 
 import (
+	"context"
 	"flag"
-	"fmt"
-	"log"
 	"os"
+	"os/signal"
+	"strings"
+	"syscall"
 	"time"
 
+	"github.com/joho/godotenv"
+	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
+
+	"github.com/panoramablock/thegraph-data-extraction/internal/app"
 	"github.com/panoramablock/thegraph-data-extraction/internal/config"
-	"github.com/panoramablock/thegraph-data-extraction/pkg/client"
-	"github.com/panoramablock/thegraph-data-extraction/pkg/extraction"
 )
 
 func main() {
+	// Setup graceful shutdown
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	// Setup signal handling
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	go func() {
+		sig := <-sigChan
+		log.Info().Str("signal", sig.String()).Msg("Received shutdown signal")
+		cancel()
+	}()
+
+	// Configure logging
+	zerolog.TimeFieldFormat = zerolog.TimeFormatUnix
+	logLevel := zerolog.InfoLevel
+	if os.Getenv("DEBUG") == "true" {
+		logLevel = zerolog.DebugLevel
+	}
+	zerolog.SetGlobalLevel(logLevel)
+	log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout, TimeFormat: time.RFC3339})
+
+	// Load .env file if exists
+	if err := godotenv.Load(); err != nil && !os.IsNotExist(err) {
+		log.Warn().Err(err).Msg("Error loading .env file")
+	}
+
 	// Define command-line flags
 	outputDir := flag.String("output", "data", "Output directory for extracted data")
-	concurrency := flag.Int("concurrency", 11, "Number of concurrent queries")
+	concurrency := flag.Int("concurrency", 4, "Initial number of concurrent workers")
+	kafkaBrokers := flag.String("kafka", "localhost:9092", "Comma-separated list of Kafka brokers")
+	topicPrefix := flag.String("topic-prefix", "thegraph", "Prefix for Kafka topics")
+	pageSize := flag.Int("page-size", 100, "Number of items per page in GraphQL queries")
 	flag.Parse()
 
-	for {
-		fmt.Println("Starting data extraction loop...")
-
-		// Load configuration
-		cfg, err := config.LoadConfig()
-		if err != nil {
-			log.Printf("Failed to load configuration: %v\n", err)
-			waitForNextRun()
-			continue
-		}
-
-		// Validate configuration
-		if len(cfg.Endpoints) == 0 {
-			log.Println("No endpoints configured. Check your ENDPOINTS_JSON environment variable.")
-			waitForNextRun()
-			continue
-		}
-		if cfg.AuthToken == "" {
-			log.Println("No auth token provided. Check your GRAPHQL_AUTH_TOKEN environment variable.")
-			waitForNextRun()
-			continue
-		}
-
-		// Create client
-		graphClient := client.NewTheGraphClient(cfg.AuthToken)
-
-		// Create extraction service
-		service := extraction.NewService(graphClient, cfg.Endpoints)
-		service.SetOutputDir(*outputDir)
-		service.SetConcurrency(*concurrency)
-
-		// Create output directory if it doesn't exist
-		if err := os.MkdirAll(*outputDir, 0755); err != nil {
-			log.Printf("Failed to create output directory: %v\n", err)
-			waitForNextRun()
-			continue
-		}
-
-		// Start extraction
-		fmt.Printf("Extracting from %d endpoints...\n", len(cfg.Endpoints))
-		if err := service.ExtractAll(); err != nil {
-			log.Printf("Extraction failed: %v\n", err)
-		} else {
-			fmt.Println("Data extraction completed successfully")
-		}
-
-		waitForNextRun()
+	// Load configuration
+	cfg, err := config.LoadConfig()
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to load configuration")
 	}
-}
 
-func waitForNextRun() {
-	fmt.Println("Waiting 30 minutes for the next run...")
-	time.Sleep(30 * time.Minute)
-}
+	// Validate configuration
+	if len(cfg.Endpoints) == 0 {
+		log.Fatal().Msg("No endpoints configured. Check your ENDPOINTS_JSON environment variable.")
+	}
+	if cfg.AuthToken == "" {
+		log.Fatal().Msg("No auth token provided. Check your GRAPHQL_AUTH_TOKEN environment variable.")
+	}
+
+	// Create application config
+	appConfig := app.Config{
+		GraphQLAuthToken: cfg.AuthToken,
+		Endpoints:        cfg.Endpoints,
+		QueryTypes:       []string{"tokens", "transactions", "factories", "swaps"},
+		OutputDir:        *outputDir,
+		KafkaBrokers:     strings.Split(*kafkaBrokers, ","),
+		KafkaTopicPrefix: *topicPrefix,
+		KafkaProducer:    "thegraph-extractor",
+		PageSize:         *pageSize,
+		MaxRetries:       3,
+		MinWorkers:       2,
+		MaxWorkers:       10,
+		InitialWorkers:   *concurrency,
+		InitialRate:      5.0,
+		MaxRate:          20.0,
+	}
+
+	// Create application
+	application, err := app.NewApplication(ctx, appConfig)
+	if err != nil {
+		log.Fatal().Err(err).Msg("Failed to create application")
+	}
+
+	// Ensure cleanup on exit
+	defer func() {
+		if err := application.Close(); err != nil {
+			log.Error().Err(err).Msg("Error during application shutdown")
+		}
+	}()
+
+	// Create output directory if it doesn't exist
+	if err := os.MkdirAll(*outputDir, 0755); err != nil {
+		log.Fatal().Err(err).Str("dir", *outputDir).Msg("Failed to create output directory")
+	}
+
+	// Start extraction
+	log.Info().
+		Int("endpoints", len(cfg.Endpoints)).
+		Int("workers", *concurrency).
+		Str("output", *outputDir).
+		Msg("Starting data extraction")
+
+	startTime := time.Now()
+	if err := application.ExtractionService.ExtractAll(ctx); err != nil {
+		log.Fatal().Err(err).Msg("Extraction failed")
+	}
+
+	duration := time.Since(startTime)
+	log.Info().
+		Dur("duration", duration).
+		Msg("Data extraction completed successfully")
+} 
