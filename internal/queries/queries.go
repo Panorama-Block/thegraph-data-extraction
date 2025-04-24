@@ -104,6 +104,11 @@ var queryVariants = map[string]map[string]string{
 	},
 }
 
+// GetQueryVariants returns the map of query variants for use in other components
+func GetQueryVariants() map[string]map[string]string {
+	return queryVariants
+}
+
 // GetEndpointID returns a shortened endpoint ID for use in logs and filenames
 func GetEndpointID(endpoint string) string {
 	// Use just the first 8 characters of the endpoint for readability
