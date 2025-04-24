@@ -28,8 +28,8 @@ func NewService(client *client.TheGraphClient, endpoints []string) *Service {
 		client:      client,
 		endpoints:   endpoints,
 		outputDir:   "data",
-		queryTypes:  []string{"tokens", "transactions", "factories", "swaps"},
-		concurrency: 4, // Number of concurrent queries
+		queryTypes:  []string{"tokens", "transactions", "factories", "swaps", "_meta", "vaults", "withdraws", "burns", "accounts", "pools", "skimFees"},
+		concurrency: 11, // Number of concurrent queries
 	}
 }
 
@@ -57,10 +57,10 @@ func (s *Service) ExtractAll() error {
 
 	// Use a wait group to wait for all goroutines to finish
 	var wg sync.WaitGroup
-	
+
 	// Use a semaphore to limit concurrency
 	semaphore := make(chan struct{}, s.concurrency)
-	
+
 	// Track errors
 	var errorsMu sync.Mutex
 	var errors []error
@@ -69,7 +69,7 @@ func (s *Service) ExtractAll() error {
 	for _, endpoint := range s.endpoints {
 		for _, queryType := range s.queryTypes {
 			wg.Add(1)
-			
+
 			// Get the query for this endpoint and type
 			query := queries.GetQueryForEndpoint(endpoint, queryType)
 			if query == "" {
@@ -77,18 +77,18 @@ func (s *Service) ExtractAll() error {
 				wg.Done()
 				continue
 			}
-			
+
 			// Execute the query in a goroutine
 			go func(endpoint, queryType, query string) {
 				defer wg.Done()
-				
+
 				// Acquire semaphore
 				semaphore <- struct{}{}
 				defer func() { <-semaphore }()
-				
+
 				// Set the client endpoint
 				s.client.SetEndpoint(endpoint)
-				
+
 				// Execute the query
 				response := make(map[string]interface{})
 				if err := s.client.QueryWithTimeout(query, &response, 30*time.Second); err != nil {
@@ -99,10 +99,10 @@ func (s *Service) ExtractAll() error {
 					errorsMu.Unlock()
 					return
 				}
-				
+
 				// Get a shorter endpoint ID for the filename
 				endpointID := queries.GetEndpointID(endpoint)
-				
+
 				// Save the response to a file
 				filename := filepath.Join(s.outputDir, fmt.Sprintf("%s_%s.json", endpointID, queryType))
 				if err := s.saveJSON(filename, response); err != nil {
@@ -113,16 +113,16 @@ func (s *Service) ExtractAll() error {
 					errorsMu.Unlock()
 					return
 				}
-				
+
 				// Print successful extraction
 				log.Printf("✅ Successfully extracted %s from %s", queryType, endpointID)
 			}(endpoint, queryType, query)
 		}
 	}
-	
+
 	// Wait for all goroutines to finish
 	wg.Wait()
-	
+
 	// Check if there were any errors
 	if len(errors) > 0 {
 		log.Printf("Completed with %d errors", len(errors))
@@ -131,7 +131,7 @@ func (s *Service) ExtractAll() error {
 		}
 		return fmt.Errorf("encountered %d errors during extraction", len(errors))
 	}
-	
+
 	log.Printf("All data extracted successfully")
 	return nil
 }
@@ -143,7 +143,7 @@ func (s *Service) saveJSON(filename string, data interface{}) error {
 	if err != nil {
 		return err
 	}
-	
+
 	// Write the data to the file
 	return os.WriteFile(filename, jsonData, 0644)
-} 
+}

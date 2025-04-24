@@ -73,7 +73,7 @@ var queryVariants = map[string]map[string]string{
     totalFeesUSD
     untrackedVolumeUSD
   }}`,
-    "EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
+		"EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
   factories(first: 1000) {
     id
     poolCount
@@ -102,6 +102,164 @@ var queryVariants = map[string]map[string]string{
   }
 }`,
 	},
+	"_meta": {
+		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
+  _meta {
+    deployment
+    hasIndexingErrors
+  }
+}`,
+		"9EAxYE17Cc478uzFXRbM7PVnMUSsgb99XZiGxodbtpbk": `{
+   _meta {
+    deployment
+    hasIndexingErrors
+  }
+}`,
+		"EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
+  _meta {
+    deployment
+    hasIndexingErrors
+  }
+}`,
+	},
+	"vaults": {
+		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
+  vaults {
+    defaultAlienDepositFee
+    defaultAlienWithdrawFee
+    defaultNativeDepositFee
+    defaultNativeWithdrawFee
+    id
+  }
+}`,
+	},
+	"withdraws": {
+		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
+  withdraws {
+    amount
+    fee
+    id
+    isNative
+    payloadId
+  }
+}`,
+	},
+	"burns": {
+		"9EAxYE17Cc478uzFXRbM7PVnMUSsgb99XZiGxodbtpbk": `{
+  burns {
+    amount
+    amount0
+    amount1
+    amountUSD
+    id
+    logIndex
+    origin
+    owner
+    tickLower
+    tickUpper
+    timestamp
+  }
+}`,
+		"EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
+  burns {
+    amount
+    amount0
+    amount1
+    amountUSD
+    id
+    logIndex
+    origin
+    owner
+    tickLower
+    tickUpper
+    timestamp
+  }
+}`,
+	},
+	"accounts": {
+		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
+  accounts {
+    id
+  }
+}`,
+	},
+	"pools": {
+		"9EAxYE17Cc478uzFXRbM7PVnMUSsgb99XZiGxodbtpbk": `{
+   pools {
+    balanceOfBlock
+    collectedFeesToken0
+    collectedFeesToken1
+    collectedFeesUSD
+    createdAtBlockNumber
+    createdAtTimestamp
+    feeGrowthBlock
+    feeGrowthGlobal0X128
+    feeGrowthGlobal1X128
+    feeTier
+    feesUSD
+    id
+    liquidity
+    liquidityProviderCount
+    observationIndex
+    protocolFeeToken0
+    protocolFeeToken1
+    sqrtPrice
+    tick
+    token0Price
+    token1Price
+    totalValueLockedNative
+    totalValueLockedToken0
+    totalValueLockedToken1
+    totalValueLockedUSD
+    txCount
+    untrackedVolumeUSD
+    volumeToken0
+    volumeToken1
+    volumeUSD
+  }
+}`,
+		"EMnAvnfc1fwGSU6ToqYJCeEkXmSgmDmhwtyaha1tM5oi": `{
+   pools {
+    collectedFeesToken0
+    collectedFeesToken1
+    collectedFeesUSD
+    createdAtBlockNumber
+    createdAtTimestamp
+    feeGrowthGlobal0X128
+    feeGrowthGlobal1X128
+    feeTier
+    feesUSD
+    id
+    initialFee
+    liquidity
+    liquidityProviderCount
+    observationIndex
+    sqrtPrice
+    tick
+    token0Price
+    token1Price
+    totalValueLockedETH
+    totalValueLockedToken0
+    totalValueLockedToken1
+    totalValueLockedUSD
+    totalValueLockedUSDUntracked
+    txCount
+    untrackedVolumeUSD
+    volumeToken1
+    volumeToken0
+    volumeUSD
+  }
+}`,
+	},
+	"skimFees": {
+		"9cT3GzNxcLWFXGAgqdJsydZkh9ajKEXn4hKvkRLJHgwv": `{
+  skimFees {
+    amount
+    id
+    skimToEverscale
+  }
+}`,
+	},
 }
 
 // GetQueryVariants returns the map of query variants for use in other components
@@ -125,22 +283,22 @@ func GetQueryForEndpoint(endpoint string, queryType string) string {
 		if query, ok := variants[endpoint]; ok {
 			return query
 		}
-		
-		// If no exact match, try to find an endpoint that contains this one 
+
+		// If no exact match, try to find an endpoint that contains this one
 		// (for example, if endpoint is shortened)
 		for variantEndpoint, query := range variants {
-			if strings.Contains(endpoint, variantEndpoint) || 
-			   strings.Contains(variantEndpoint, endpoint) {
+			if strings.Contains(endpoint, variantEndpoint) ||
+				strings.Contains(variantEndpoint, endpoint) {
 				return query
 			}
 		}
-		
+
 		// Fall back to default if available
 		if defaultQuery, ok := variants["default"]; ok {
 			return defaultQuery
 		}
 	}
-	
+
 	// If no query is found or no default, return empty
 	return ""
-} 
+}
