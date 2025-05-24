@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/segmentio/kafka-go"
 	"github.com/rs/zerolog/log"
-	
+	"github.com/segmentio/kafka-go"
+
 	"github.com/panoramablock/thegraph-data-extraction/internal/domain/entity"
 )
 
