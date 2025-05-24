@@ -1,6 +1,6 @@
-# TheGraph Data Extraction
+# TheGraph AVAX DEX Data Extraction
 
-A powerful tool for extracting data from The Graph API endpoints using a modular hexagonal architecture.
+A powerful tool for extracting AVAX DEX data from The Graph API endpoints using a modular hexagonal architecture.
 
 ## Features
 
