@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  thegraph-extractor:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: thegraph-extractor
+    restart: unless-stopped
+    environment:
+      # Application Configuration
+      - DEBUG=${DEBUG:-false}
+      
+      # TheGraph API Configuration
+      - GRAPHQL_AUTH_TOKEN=${GRAPHQL_AUTH_TOKEN}
+      - ENDPOINTS_JSON=${ENDPOINTS_JSON}
+      
+      # Kafka Configuration (even if not using Kafka container now)
+      - KAFKA_BROKERS=${KAFKA_BROKERS:-localhost:9092}
+      - KAFKA_TOPIC_PREFIX=${KAFKA_TOPIC_PREFIX:-thegraph}
+      
+      # Extraction Configuration
+      - OUTPUT_DIR=${OUTPUT_DIR:-/app/data}
+      - CONCURRENCY=${CONCURRENCY:-8}
+      - CRON_SCHEDULE=${CRON_SCHEDULE:-*/5 * * * *}
+      - ENABLE_KAFKA=${ENABLE_KAFKA:-false}
+      
+      # Optional: Timezone configuration
+      - TZ=${TZ:-UTC}
+      
+    volumes:
+      # Mount data directory to persist extracted data
+      - ${HOST_DATA_DIR:-./data}:/app/data
+      
+      # Mount .env file for configuration
+      - ./.env:/app/.env:ro
+      
+    # Network configuration (if you plan to add Kafka later)
+    networks:
+      - thegraph-network
+    
+    # Resource limits (optional but recommended)
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 256M
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "pgrep", "-f", "thegraph-extractor"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
+
+networks:
+  thegraph-network:
+    driver: bridge
+    name: thegraph-network
+
+# Optional: Define volumes for persistence
+volumes:
+  thegraph-data:
+    driver: local
+    name: thegraph-extraction-data 
